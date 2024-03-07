@@ -1,0 +1,8 @@
+{% for post in latest_posts %}
+<li class="recent-post">
+  <span>&bull;</span>
+  <a href="{{post.get_absolute_url}}" class="recent-post-link">
+    {{post.title}}</a
+  >
+</li>
+{% endfor %}

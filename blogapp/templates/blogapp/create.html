@@ -1,0 +1,20 @@
+{% extends 'base.html' %} {% block main %}
+<main class="main">
+  <div class="wrapper">
+    <h2 style="margin-bottom: 0.8rem">Create Post</h2>
+    <p>
+      didn't find your category?
+      <a href="{% url 'blogapp:add_category' %}">add new category</a>
+    </p>
+    <form method="post" class="post-form" enctype="multipart/form-data">
+      {% csrf_token %} {{ form.media }} {{form.as_p}}
+
+      <div>
+        <button class="button primary" type="submit">Create Post</button>
+
+        <a href="{{ request.META.HTTP_REFERER }}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
+{% endblock %}

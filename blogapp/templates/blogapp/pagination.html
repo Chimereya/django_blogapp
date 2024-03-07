@@ -1,0 +1,19 @@
+<div class="pagination">
+  {% if object_list.has_previous %}
+  <a href="?page=1"> First</a>
+  <a href="?page={{object_list.previous_page_number}}">&laquo; Previous</a>
+  {% endif %}
+   {% for num in object_list.paginator.page_range %}
+    {% if object_list.number == num %}
+  <a href="?page={{forloop.counter}}" class="bg-blue" style="color: #fff"
+    ><span>{{num}}</span></a
+  >
+  {% else %}
+  <a href="?page={{forloop.counter}}"><span>{{num}}</span></a>
+  {% endif %}
+   {% endfor %}
+    {% if object_list.has_next %}
+  <a href="?page={{object_list.next_page_number}}">Next &raquo;</a>
+  <a href="?page={{object_list.paginator.num_pages}}">last</a>
+  {% endif %}
+</div>

@@ -1,0 +1,16 @@
+{% extends 'base.html' %} {% block main %}
+<main class="main container">
+  <h2 style="margin-bottom: 0.8rem">Add Category</h2>
+  <form method="post" class="post-form" enctype="multipart/form-data">
+    {% csrf_token %} {{form.as_p}} {% for error in field.errors %}
+    <span>{{error}}</span>
+    {% endfor %}
+
+    <div>
+      <button class="button btn-main" type="submit">Add Category</button>
+
+      <a href="{% url 'blogapp:home' %}">cancel</a>
+    </div>
+  </form>
+</main>
+{% endblock %}

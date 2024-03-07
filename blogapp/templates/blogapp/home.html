@@ -1,0 +1,51 @@
+{% extends 'base.html' %} {% load blog_tags %} {% block main %}
+<div class="show-case">
+  <h1>Welcome to Weblogapp</h1>
+  <p class="show-case-text">Learn a whole lot from us!</p>
+</div>
+
+<main>
+  {% if tag %}
+  <h2 class="container" style="margin-bottom: 1.1rem">
+    Posts tagged with "{{ tag.name }}"
+  </h2>
+  {% endif %}
+
+  <div class="container">
+    <section>
+      <div class="main-wrapper">
+        {% for blog in object_list %}
+
+        <!--  blog card -->
+        <div class="blog-card">
+          <div>
+            {% if blog.image %}<a href="{{ blog.get_absolute_url }}">
+              <img src="{{ blog.image.url }}" class="blog-card-img" /></a
+            >{% endif %}
+          </div>
+          <div class="card-content">
+            <a href="{% url 'blogapp:category' blog.category.slug %}" class="category">{{ blog.category }}</a>
+            <a href="{{ blog.get_absolute_url }}" class="card-title"
+              ><h3>{{ blog.title }}</h3></a>
+
+            <p>
+              {{blog.content|safe|truncatewords:14}}
+              <a href="{{ blog.get_absolute_url }}" class="read-more"
+                >Read more</a
+              >
+            </p>
+          </div>
+        </div>
+        <!-- end blog card -->
+
+        {% endfor %}
+      </div>
+      <!--end main wrapper-->
+      {% include 'blogapp/pagination.html' %}
+    </section>
+
+    {% include 'blogapp/sidebar.html' %}
+  </div>
+</main>
+
+{% endblock %}

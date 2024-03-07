@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+{% load blog_tags %}
+{% load static %}
+{% load social_share %}
+<html lang="en">
+<head>
+<title>
+Weblogapp-learning from us
+	</title>
+	<meta name="description"
+		  content="Weblogapp provides tutorials to enable rapid learning">
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.6.0/styles/a11y-dark.css">
+	<script src="https://kit.fontawesome.com/66af27bf36.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header>
+	<nav class="container">
+
+			<a href="{% url 'blogapp:home'%}" class="brand">Weblogapp</a>
+
+
+		<button class="nav-toggler">
+				<span></span>
+			</button>
+
+		<div class="nav-menu">
+			<ul>
+			<li><a href="{% url 'blogapp:home'%}">Home</a></li>
+
+			 {% if user.is_staff %}
+      <li><a href="{% url 'blogapp:create' %}">Create Post</a></li>
+      {% endif %}
+
+				{% if user.is_authenticated %}
+				<li><a href="{% url 'user:logout' %}" class="logout">Logout</a></li>
+
+{% else %}
+				<li><a href="{% url 'user:login' %}" class="login">Login</a></li>
+				<li><a href="{% url 'user:signup' %}" class="signup">Sign Up</a></li>
+
+{% endif %}
+		</ul>
+		</div>
+
+
+	</nav>
+</header>
+
+
+
+ {% block main %}
+
+
+  {% endblock %}
+
+
+
+
+
+<footer>
+		<div class="footer-top container">
+			<div class="footer-wrapper">
+
+				<a href="{% url 'blogapp:home' %}" class="brand">Weblogapp</a>
+
+			</div>
+
+
+       <div class="footer-wrapper">
+<a href="{% url 'blogapp:about' %}" class="footer-link">About Us</a>
+
+            <a href="{% url 'blogapp:terms' %}" class="footer-link">Terms of use</a>
+		   <a href="{% url 'blogapp:privacy' %}" class="footer-link">Privacy Policy</a>
+
+      </div>
+
+
+		</div>
+
+		<div class="footer-bottom container">
+			<p class="copyright">
+      &copy; Copyright 2022 <a href="{% url 'blogapp:home'%}">Weblogapp</a>
+    </p>
+		</div>
+	</footer>
+
+
+ {% block javascript %}
+    <script src="{% static 'js/script.js' %}"></script>
+    {% endblock javascript %}
+
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js"></script>
+
+<script>
+	hljs.initHighlightingOnLoad();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+{% load blog_tags %} {% load static %} {% load social_share %}
+<html lang="en">
+  <head>
+    <title>{% block title %} {{ post.title }} {% endblock %}</title>
+    <meta name="description" content="{{post.content|safe|truncatewords:14}}" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/highlight.js@11.6.0/styles/a11y-dark.css"
+    />
+    <script
+      src="https://kit.fontawesome.com/66af27bf36.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+
+<header>
+	<nav class="container">
+
+			<a href="{% url 'blogapp:home'%}" class="brand">Weblogapp</a>
+
+
+		<button class="nav-toggler">
+				<span></span>
+			</button>
+
+		<div class="nav-menu">
+			<ul>
+			<li><a href="{% url 'blogapp:home'%}">Home</a></li>
+
+			 {% if user.is_staff %}
+      <li><a href="{% url 'blogapp:create' %}">Create Post</a></li>
+      {% endif %}
+
+				{% if user.is_authenticated %}
+				<li><a href="{% url 'user:logout' %}" class="logout">Logout</a></li>
+
+{% else %}
+				<li><a href="{% url 'user:login' %}" class="login">Login</a></li>
+				<li><a href="{% url 'user:signup' %}" class="signup">Sign Up</a></li>
+
+{% endif %}
+		</ul>
+		</div>
+
+
+	</nav>
+</header>
+
+    {% if messages %} {% for message in messages %}
+    <div class="alert alert-{{message.tags}}">{{message}}</div>
+    {% endfor %} {% endif %} {% block main %}
+
+    <main>
+      <div class="container">
+        <article>
+          <div class="article-header">
+            <a href="{% url 'blogapp:category' post.category.slug %}" class="category"
+              >{{ post.category }}</a
+            >
+
+            <h1>{{ post.title }}</h1>
+
+            <p class="post-timing">
+              by {{post.author}}<span>&bull; </span>{{post.date_created|date}}
+            </p>
+
+            {% if post.image %}<img
+              src="{{ post.image.url }}"
+              class="header-img"
+            />{% endif %} {% if post.image_credit %}
+            <p class="credit">
+              image credit:
+              <a href="{{post.image_credit}}">{{post.image_credit}}</a>
+            </p>
+            {% endif %}
+          </div>
+
+          <div class="main-detail">{{ post.content|safe }}</div>
+          <!-- end main detail -->
+
+          <div class="article-tag-box">
+            <h3>Tags</h3>
+            {% for tag in post.tags.all %}
+            <a href="{% url 'blogapp:posts_by_tag' tag.slug %}" class="tag-link"
+              >#{{tag.name}}</a
+            >
+            {% endfor %}
+          </div>
+
+          <div class="article-bottom">
+            {% if user.is_staff %}
+            <div class="link-group">
+              <a href="{% url 'blogapp:edit' post.pk %}" class="button primary">Edit</a>
+              <a href="{% url 'blogapp:delete' post.pk %}" class="button error"
+                >Delete</a
+              >
+            </div>
+            {% endif %}
+          </div>
+          <!-- end article bottom -->
+
+          <div class="similar">
+            <h2>Similar Posts</h2>
+            <div class="similar-wrapper">
+              {% for post in similar_posts %}
+              <div class="similar-post-card">
+                {% if post.image %}<img src="{{post.image.url}}" />{% endif %}
+                <div class="card-content">
+                  <a
+                    href="{{ post.get_absolute_url }}"
+                    class="similar-post-title"
+                  >
+                    <h3>{{post.title}}</h3>
+                  </a>
+                  <p class="similar-post-date">{{post.date_created|date}}</p>
+                </div>
+              </div>
+              {% empty %} no similar posts yet. {% endfor %}
+            </div>
+          </div>
+
+          <div class="comment-wrapper">
+            <h2>Comments</h2>
+             {% if not user.is_authenticated %}
+            <small>please <a href="{% url 'user:login'%}">login</a> to make comments</small>
+            {% endif %}
+            {% for comment in comments %}
+            <div class="comment">
+              <div class="comment-body">
+                <div class="comment-header">
+                  <p>
+                    <strong class="comment-name">{{ comment.name }}</strong>
+                    <small class="timing">
+                      &bull; {{comment.date_created|timesince }} ago</small
+                    >
+                  </p>
+                </div>
+
+                <p>{{comment.body}}</p>
+
+                  {% if user.is_authenticated %}
+                <button
+                  class="show-reply-form"
+                  style="
+                    padding: 3px 8px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    margin-bottom: 1.2rem;
+                    border: 1px solid #6e7780;
+                  "
+                >
+                  reply
+                </button>
+                <div class="accordion-content">
+                  <form method="post" action="." class="comment-form post-form">
+                    <h3>reply</h3>
+                    {% csrf_token %} {{comment_form.as_p}}
+                    <!--parent comment.id -->
+                    <input
+                      type="hidden"
+                      name="parent_id"
+                      value="{{ comment.id }}"
+                    />
+                    <button class="button primary" type="submit" value="Reply">
+                      Reply
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <!--end comment body-->
+
+            {% endif %}
+              {% for reply in comment.replies.all %}
+              <div class="comment-body" style="margin-left: 45px">
+                <div class="comment-header">
+                  <p>
+                    <strong class="comment-name">{{ reply.name }}</strong>
+                    <small class="timing">
+                      &bull; {{reply.date_created|timesince }} ago</small
+                    >
+                  </p>
+                </div>
+
+                <p>{{reply.body}}</p>
+
+                {% if user.is_authenticated %}
+                <button
+                  class="show-reply-form"
+                  style="
+                    padding: 3px 8px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    margin-bottom: 1rem;
+                    border: 1px solid #6e7780;
+                  "
+                >
+                  reply
+                </button>
+
+                <div class="accordion-content">
+                  <form method="post" action="." class="comment-form post-form">
+                    <h3>reply</h3>
+                    {% csrf_token %} {{comment_form.as_p}}
+                    <!--parent comment.id -->
+                    <input
+                      type="hidden"
+                      name="parent_id"
+                      value="{{ comment.id }}"
+                    />
+                    <button class="button primary" type="submit" value="Reply">
+                      Reply
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+
+            {% endif %}
+
+              {% endfor %}
+            </div>
+            {% endfor %}
+            <!--end comment-->
+          </div>
+          <!--end comment wrapper-->
+
+          <div class="comment-form-wrapper" style="margin-top: 3rem">
+             {% if user.is_authenticated %}
+            <h2>Leave a reply</h2>
+
+            <form id="comment-form" method="post" action="." class="comment-form post-form">
+              {% csrf_token %} {{comment_form.as_p}}
+              <button class="button primary" type="submit">Comment</button>
+            </form>
+            {% endif %}
+          </div>
+
+          <!--end detail wrapper-->
+        </article>
+        {% include 'blogapp/sidebar.html' %}
+      </div>
+    </main>
+
+    {% endblock %}
+
+    <footer>
+      <div class="footer-top container">
+        <div class="footer-wrapper">
+          <a href="{% url 'blogapp:home' %}" class="brand">Weblogapp</a>
+        </div>
+
+        <div class="footer-wrapper">
+          <a href="{% url 'blogapp:about' %}" class="footer-link">About Us</a>
+
+          <a href="{% url 'blogapp:terms' %}" class="footer-link">Terms of use</a>
+          <a href="{% url 'blogapp:privacy' %}" class="footer-link">Privacy Policy</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom container">
+        <p class="copyright">
+          &copy; Copyright 2022 <a href="{% url 'blogapp:home'%}">Weblogapp</a>
+        </p>
+      </div>
+    </footer>
+
+    {% block javascript %}
+    <script src="{% static 'js/script.js' %}"></script>
+    {% endblock javascript %}
+
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js"></script>
+
+    <script>
+      hljs.initHighlightingOnLoad();
+    </script>
+
+    <script>
+      const accord = document.getElementsByClassName('show-reply-form');
+let i;
+
+for (i = 0; i < accord.length; i++) {
+	accord[i].addEventListener("click", function(){
+		this.classList.toggle("active");
+		let reply = this.nextElementSibling;
+		if (reply.style.display === "block"){
+			reply.style.display = "none";
+
+		}else{
+			reply.style.display = "block";
+		}
+	});
+}
+    </script>
+  </body>
+</html>
