@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block main %}
+
+<main>
+    
+  <h1>Your Bookmarked Posts</h1>
+  
+  {% for bookmark in bookmarks %}
+  <li><a href="{% url 'blogapp:detail' slug=bookmark.post.slug %}">
+    {{ bookmark.post.title }}</a></li>
+  {% empty %}
+  <p>No bookmarked posts yet.</p>
+  {% endfor %}
+  
+</main>
+{% endblock %}

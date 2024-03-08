@@ -137,6 +137,8 @@ STATIC_ROOT = str(BASE_DIR.joinpath('staticfiles'))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# django tinymce config
+
 TINYMCE_DEFAULT_CONFIG = {
     'height': 360,
     'width': "auto",
@@ -150,4 +152,5 @@ TINYMCE_DEFAULT_CONFIG = {
     'relative_urls': False,
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+LOGIN_REDIRECT_URL = 'blogapp:home'
+LOGOUT_REDIRECT_URL = '/'

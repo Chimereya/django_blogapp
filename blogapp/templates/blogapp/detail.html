@@ -38,6 +38,7 @@
 
 				{% if user.is_authenticated %}
 				<li><a href="{% url 'user:logout' %}" class="logout">Logout</a></li>
+        <li><a href="{% url 'blogapp:bookmarks' %}">Bookmarked Posts</a></li>
 
 {% else %}
 				<li><a href="{% url 'user:login' %}" class="login">Login</a></li>
@@ -81,9 +82,30 @@
           </div>
 
           <div class="main-detail">{{ post.content|safe }}</div>
+
           <!-- end main detail -->
 
-          <div class="article-tag-box">
+          <!-- bookmark -->
+          
+    
+ 
+          {% if request.user.is_authenticated %}
+          {% if is_bookmarked %}
+              <a href="{% url 'blogapp:remove_bookmark' slug=post.slug %}" class="button primary"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-bookmark-check" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+              </svg></a>
+          {% else %}
+              <a href="{% url 'blogapp:add_bookmark' slug=post.slug %}" class="button primary"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
+                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+              </svg></a>
+          {% endif %}
+      {% endif %}
+
+      
+
+
+          <div class="article-tag-box" style="margin-top:1rem;">
             <h3>Tags</h3>
             {% for tag in post.tags.all %}
             <a href="{% url 'blogapp:posts_by_tag' tag.slug %}" class="tag-link"
@@ -269,9 +291,7 @@
       </div>
     </footer>
 
-    {% block javascript %}
-    <script src="{% static 'js/script.js' %}"></script>
-    {% endblock javascript %}
+    
 
     <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js"></script>
 
@@ -296,5 +316,10 @@ for (i = 0; i < accord.length; i++) {
 	});
 }
     </script>
+
+
+    {% block javascript %}
+    <script src="{% static 'js/script.js' %}"></script>
+    {% endblock javascript %}
   </body>
 </html>

@@ -61,6 +61,10 @@ class Post(models.Model):
         super(Post, self).save(*args, **kwargs)
 
 
+class Bookmark(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Comment(models.Model):

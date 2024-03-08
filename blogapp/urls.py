@@ -18,7 +18,9 @@ urlpatterns = [
     path('edit/<int:pk>/', views.EditView.as_view(), name='edit'),
     path('delete/<int:pk>/', views.Delete.as_view(), name='delete'),
     path('create/add_category/', views.CreateCategoryView.as_view(), name='add_category'),
-   
+    path('add_bookmark/<slug:slug>/', views.add_bookmark, name='add_bookmark'),
+    path('remove_bookmark/<slug:slug>/', views.remove_bookmark, name='remove_bookmark'),
+    path('post/bookmarks/', views.bookmarked_posts, name='bookmarks'),
 
 ]
 

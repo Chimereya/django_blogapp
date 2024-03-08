@@ -33,10 +33,12 @@ Weblogapp-learning from us
 
 			 {% if user.is_staff %}
       <li><a href="{% url 'blogapp:create' %}">Create Post</a></li>
+
       {% endif %}
 
 				{% if user.is_authenticated %}
 				<li><a href="{% url 'user:logout' %}" class="logout">Logout</a></li>
+				<li><a href="{% url 'blogapp:bookmarks' %}">Bookmarked Posts</a></li>
 
 {% else %}
 				<li><a href="{% url 'user:login' %}" class="login">Login</a></li>

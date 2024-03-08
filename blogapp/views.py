@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
-from .models import Post, Category, Comment, About, Privacy, Terms
+from .models import Post, Category, Comment, Bookmark, About, Privacy, Terms
 from .forms import CreateForm, CommentForm, AboutForm, PrivacyForm, TermForm
 from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse
@@ -9,6 +9,7 @@ from taggit.models import Tag
 from django.core.paginator import Paginator, EmptyPage,\
 PageNotAnInteger
 from django.db.models import Count
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 
@@ -57,6 +58,7 @@ def detail_view(request, slug, *args, **kwargs):
     post = get_object_or_404(Post, slug=slug)
     categories = Category.objects.all()
     all_tags = Tag.objects.all()
+    is_bookmarked = request.user.is_authenticated and post.id in request.user.bookmark_set.values_list('post__id', flat=True)
     comments = post.comments.filter(active=True, parent__isnull=True)
     new_comment = None
     comment_count = post.comments.count()
@@ -94,7 +96,7 @@ def detail_view(request, slug, *args, **kwargs):
                                                    'new_comment':new_comment,
                                                    'comment_form': comment_form,
                                                    'comment_count': comment_count,
-
+                                                    'is_bookmarked': is_bookmarked
                                                    })
 
 
@@ -116,7 +118,7 @@ class CreateCategoryView(CreateView):
     model = Category
     template_name = 'blogapp/add_category.html'
     fields = ['name',]
-    success_url = reverse_lazy('blogapp:home')
+    success_url = reverse_lazy('blogapp:create')
 
 class EditView(UpdateView):
     model = Post
@@ -130,6 +132,29 @@ class Delete(DeleteView):
     pk_url_kwarg = 'pk'
     success_url = reverse_lazy('blogapp:home')
     template_name = 'blogapp/delete.html'
+
+# post bookmarking functionality
+@login_required
+def add_bookmark(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    bookmark, created = Bookmark.objects.get_or_create(user=request.user, post=post)
+    # Handle case if already bookmarked
+    return redirect('blogapp:detail', slug=post.slug)
+
+@login_required
+def remove_bookmark(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    bookmark = Bookmark.objects.filter(user=request.user, post=post).first()
+    if bookmark:
+        bookmark.delete()
+    # Handle case if not bookmarked
+    return redirect('blogapp:detail', slug=post.slug)
+
+@login_required
+def bookmarked_posts(request):
+    bookmarks = Bookmark.objects.filter(user=request.user)
+    return render(request, 'blogapp/bookmarked_posts.html', {'bookmarks': bookmarks})
+
 
 
 def about_view(request):
@@ -161,6 +186,8 @@ def privacy_view(request):
     else:
         form = PrivacyForm()
     return render(request, 'blogapp/privacy.html', {'form': form, 'privacy': privacy})
+
+
 
 def error_404(request, exception):
     return render(request, '404.html')
