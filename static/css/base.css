@@ -491,9 +491,7 @@ nav ul{
     flex-direction: column;
   }
 
-  .show-case-text{
-    color:var(--light-gray);
-  }
+ 
 
   .alert{
   padding:10px;

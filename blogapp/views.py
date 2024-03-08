@@ -11,6 +11,7 @@ PageNotAnInteger
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
 
 
 def home_view(request, tag_slug=None):
@@ -155,6 +156,27 @@ def bookmarked_posts(request):
     bookmarks = Bookmark.objects.filter(user=request.user)
     return render(request, 'blogapp/bookmarked_posts.html', {'bookmarks': bookmarks})
 
+
+# like posts functionality
+@login_required
+def like_post(request, slug):
+    # check if it is a post request and ajax request
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        post = get_object_or_404(Post, slug=slug)
+        user = request.user
+
+        if user in post.likes.all():
+            post.likes.remove(user)
+            liked = False
+        else:
+            post.likes.add(user)
+            liked = True
+
+        post.save()
+
+        return JsonResponse({'liked': liked, 'count': post.likes.count()})
+    else:
+        return JsonResponse({'error': _('Invalid request')}, status=400)
 
 
 def about_view(request):

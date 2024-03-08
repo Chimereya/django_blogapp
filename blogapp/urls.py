@@ -21,6 +21,8 @@ urlpatterns = [
     path('add_bookmark/<slug:slug>/', views.add_bookmark, name='add_bookmark'),
     path('remove_bookmark/<slug:slug>/', views.remove_bookmark, name='remove_bookmark'),
     path('post/bookmarks/', views.bookmarked_posts, name='bookmarks'),
+    path('post/<slug:slug>/like/', views.like_post, name='like_post'),
+
 
 ]
 

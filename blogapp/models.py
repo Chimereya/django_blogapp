@@ -43,6 +43,7 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True)
     date_created = models.DateTimeField(default=timezone.now)
     status = models.IntegerField(choices=STATUS, default=0)
+    likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
 
     def __str__(self):
         return self.title

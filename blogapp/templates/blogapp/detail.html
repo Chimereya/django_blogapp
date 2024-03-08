@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load blog_tags %} {% load static %} {% load social_share %}
+{% load blog_tags %} {% load static %} 
 <html lang="en">
   <head>
     <title>{% block title %} {{ post.title }} {% endblock %}</title>
@@ -11,10 +11,13 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/highlight.js@11.6.0/styles/a11y-dark.css"
     />
-    <script
-      src="https://kit.fontawesome.com/66af27bf36.js"
-      crossorigin="anonymous"
-    ></script>
+    <style>
+      .liked {
+        color: #fff;
+        background-color: #3944bc;
+      }
+    </style>
+    
   </head>
   <body>
 
@@ -88,7 +91,7 @@
           <!-- bookmark -->
           
     
- 
+ <div>
           {% if request.user.is_authenticated %}
           {% if is_bookmarked %}
               <a href="{% url 'blogapp:remove_bookmark' slug=post.slug %}" class="button primary"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-bookmark-check" viewBox="0 0 16 16">
@@ -102,7 +105,12 @@
           {% endif %}
       {% endif %}
 
-      
+      <button  style="display:inline-block;" id="like-button" data-post-id="{{ post.slug }}" {% if request.user in post.likes.all %}class="liked button" {% else %} class="button" {% endif %}>
+        {% if request.user in post.likes.all %}Unlike{% else %}Like{% endif %}
+      </button>
+      <span id="like-count">{{ post.likes.count }} Likes</span>
+
+ </div>
 
 
           <div class="article-tag-box" style="margin-top:1rem;">
@@ -321,5 +329,34 @@ for (i = 0; i < accord.length; i++) {
     {% block javascript %}
     <script src="{% static 'js/script.js' %}"></script>
     {% endblock javascript %}
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+      $(document).ready(function(){
+        $('#like-button').click(function(){
+          var post_slug = "{{ post.slug }}";
+          var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    
+          $.ajax({
+            type: 'POST',
+            url: '/post/' + post_slug + '/like/',
+            headers: { "X-CSRFToken": csrftoken },
+            success: function(data){
+              if (data.liked) {
+                $('#like-button').addClass('liked').text('Unlike');
+              } else {
+                $('#like-button').removeClass('liked').text('Like');
+              }
+              
+              $('#like-count').text(data.count + ' Likes');
+            },
+            error: function(xhr, errmsg, err){
+              console.log(err);
+            }
+          });
+        });
+      });
+    </script>
+
   </body>
 </html>

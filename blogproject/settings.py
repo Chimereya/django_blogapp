@@ -41,13 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     'blogapp.apps.BlogappConfig',
     'user.apps.UserConfig',
+    
     'tinymce',
     'taggit',
-    'django_social_share',
     
 ]
+
 SITE_ID=1
 
 MIDDLEWARE = [
